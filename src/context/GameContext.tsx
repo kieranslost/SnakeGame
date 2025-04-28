@@ -5,9 +5,15 @@ type GameSettings = {
     getGridWidth: number;
     getGridHeight: number;
     getGridArray: string[][];
+    getMoveGrid: number[][][];
+    getMoveDirectionX: number;
+    getMoveDirectionY: number;
     setGridWidth: (w: number) => void;
     setGridHeight: (w: number) => void;
     setGridArray: (w: string[][]) => void;
+    setMoveGrid: (w: number[][][]) => void;
+    setMoveDirectionX: (w: number) => void;
+    setMoveDirectionY: (w: number) => void;
 };
 
 export const GameContext = createContext<GameSettings | undefined>(undefined);
@@ -16,6 +22,10 @@ export const GameProvider = ({ children }: { children: React.ReactNode }) => {
   // Grid Data
   const [getGridWidth, setGridWidth] = useState(12);
   const [getGridHeight, setGridHeight] = useState(15);
+  // Move Direction: 0 = neutral, 1 = positive, -1 = negative
+  const [getMoveGrid, setMoveGrid] = useState<number[][][]>(Array(getGridHeight).fill(null).map(() => Array(getGridWidth).fill([0, 0])));
+  const [getMoveDirectionX, setMoveDirectionX] = useState(0);
+  const [getMoveDirectionY, setMoveDirectionY] = useState(1);
   // Grid Array
   const [getGridArray, setGridArray] = useState<string[][]>(Array(getGridHeight).fill(null).map(() => Array(getGridWidth).fill("")));
 
@@ -24,9 +34,15 @@ export const GameProvider = ({ children }: { children: React.ReactNode }) => {
       getGridWidth,
       getGridHeight,
       getGridArray,
+      getMoveGrid,
+      getMoveDirectionX,
+      getMoveDirectionY,
       setGridWidth,
       setGridHeight,
-      setGridArray
+      setGridArray,
+      setMoveGrid,
+      setMoveDirectionX,
+      setMoveDirectionY,
     }}>
       {children}
     </GameContext.Provider>

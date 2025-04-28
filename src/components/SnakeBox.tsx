@@ -9,6 +9,7 @@ export const SnakeBox = styled(Box)<{ id?: string }>`
     background-color: ${({ id }) => 
         id === "head" ? "#60d394" :
             id === "body" ? "#aaf683" :
-                id === "food" ? "#ee6055" :
-                     "#ececec"};
+                id === "foot" ? "#fffa4d" :
+                    id === "apple" ? "#ee6055" :
+                        "#ececec"};
 `;
