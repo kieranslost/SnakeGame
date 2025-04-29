@@ -7,4 +7,8 @@ export const AlternativeButton = styled(Button)`
     &:hover {
         background-color: #EE6055;
     }
+
+    &:focus {
+        outline: none;
+    }
 `;

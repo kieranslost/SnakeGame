@@ -12,4 +12,7 @@ export const SnakeBox = styled(Box)<{ id?: string }>`
                 id === "foot" ? "#aaf683" :
                     id === "apple" ? "#ee6055" :
                         "#ececec"};
+
+    :focus {
+        outline: 2px solid #fffffff
 `;

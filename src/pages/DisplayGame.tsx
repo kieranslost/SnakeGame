@@ -11,8 +11,10 @@ export function DisplayGame() {
     const {
         getSnakeSpeed,
         getIntervalId,
+        getAppleAmount,
         setSnakeSpeed,
         setIntervalId,
+        setAppleAmount
     } = useGameSettings();
 
     const startGame = () => {
@@ -34,6 +36,10 @@ export function DisplayGame() {
                 Snake Speed:
                 <Input type={"number"} sx={{width: "100px"}} value={getSnakeSpeed}
                     onChange={e => setSnakeSpeed(e.target.valueAsNumber)}></Input>
+                Apple Amount:
+                <Input type={"number"} sx={{width: "100px"}} value={getAppleAmount}
+                    onChange={e => setAppleAmount(e.target.valueAsNumber)}></Input>
+                    
             </div>
             <SnakeGrid></SnakeGrid>
         </>

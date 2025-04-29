@@ -8,23 +8,24 @@ export function HandleGameLogic() {
         getGridHeight,
         getGridArray,
         getMoveGrid,
+        getSaveMoveCommands,
         getLastFootMoveInstruction,
-        getMoveDirectionY,
-        getMoveDirectionX,
         getIntervalId,
+        getAppleAmount,
         setMoveGrid,
         setGridArray,
+        setSaveMoveCommands,
         setLastFootMoveInstruction,
-        setMoveDirectionY,
-        setMoveDirectionX,
         setIntervalId
     } = useGameSettings();
 
+    // TODO
+    // "WallProtal" mode
+
     const moveGridRef = useRef(getMoveGrid);
     const gridArrayRef = useRef(getGridArray);
+    const saveMoveCommandsRef = useRef(getSaveMoveCommands);
     const lastFootMoveInstructionRef = useRef(getLastFootMoveInstruction);
-    const moveDirectionYRef = useRef(getMoveDirectionY);
-    const moveDirectionXRef = useRef(getMoveDirectionX);
     const intervalIdRef = useRef(getIntervalId);
 
     useEffect(() => {
@@ -34,14 +35,11 @@ export function HandleGameLogic() {
         gridArrayRef.current = getGridArray;
     }, [getGridArray]);
     useEffect(() => {
+        saveMoveCommandsRef.current = getSaveMoveCommands;
+    }, [getSaveMoveCommands]);
+    useEffect(() => {
         lastFootMoveInstructionRef.current = getLastFootMoveInstruction;
     }, [getLastFootMoveInstruction]);
-    useEffect(() => {
-        moveDirectionYRef.current = getMoveDirectionY;
-    }, [getMoveDirectionY]);
-    useEffect(() => {
-        moveDirectionXRef.current = getMoveDirectionX;
-    }, [getMoveDirectionX]);
     useEffect(() => {
         intervalIdRef.current = getIntervalId;
     }, [getIntervalId]);
@@ -52,164 +50,163 @@ export function HandleGameLogic() {
 
     const handleKeyInput = (keyPressed: string) => {
 
+        const saveCurrentMoveCommands = saveMoveCommandsRef.current[0];
+        const saveLastMoveCommands = saveMoveCommandsRef.current[1];
+
         if(keyPressed === "w" || keyPressed === "ArrowUp"){
-            if(moveDirectionYRef.current !== 1){
-                setMoveDirectionY(-1);
-                setMoveDirectionX(0);
+            if(saveCurrentMoveCommands[0] !== 1 && saveLastMoveCommands[0] !== 1){
+                saveMoveCommandsRef.current[0] = [-1, 0];
+                setSaveMoveCommands(saveMoveCommandsRef.current);
+
             }
             return;
         }
         if(keyPressed === "s" || keyPressed === "ArrowDown"){
-            if(moveDirectionYRef.current !== -1){
-                setMoveDirectionY(1);
-                setMoveDirectionX(0);
+            if(saveCurrentMoveCommands[0] !== -1 && saveLastMoveCommands[0] !== -1){
+                saveMoveCommandsRef.current[0] = [1, 0];
+                setSaveMoveCommands(saveMoveCommandsRef.current);
             }
             return;
         }
         if(keyPressed === "a" || keyPressed === "ArrowLeft"){
-            if(moveDirectionXRef.current !== 1){
-                setMoveDirectionY(0);
-                setMoveDirectionX(-1);
+            if(saveCurrentMoveCommands[1] !== 1 && saveLastMoveCommands[1] !== 1){
+                saveMoveCommandsRef.current[0] = [0, -1];
+                setSaveMoveCommands(saveMoveCommandsRef.current);
             }
             return;
         }
         if(keyPressed === "d" || keyPressed === "ArrowRight"){
-            if(moveDirectionXRef.current !== -1){
-                setMoveDirectionY(0);
-                setMoveDirectionX(1);
+            if(saveCurrentMoveCommands[1] !== -1 && saveLastMoveCommands[1] !== -1){
+                saveMoveCommandsRef.current[0] = [0, 1];
+                setSaveMoveCommands(saveMoveCommandsRef.current);
             }
             return;
         }
     }
 
-    const handleWallHit = () => {
+    const checkGameWon = (updateGrid: string[][]) => {
 
+        for(let row = 0; row < getGridHeight; row++){
+            for(let col = 0; col < getGridWidth; col++){
+                if(updateGrid[row][col] === "apple"){
+                    return;
+                }
+            }
+        }
+        
         if(intervalIdRef.current){
-            console.log("testIntercal");
+            clearInterval(intervalIdRef.current);
+            setIntervalId(null);
+        }
+        alert("Well Done!");
+        return;
+    }
+
+    const handleWallHit = () => {
+        if(intervalIdRef.current){
             clearInterval(intervalIdRef.current);
             setIntervalId(null);
         }
         alert("you lost");
     }
 
-    const growApples = (updateGrid: string[][]) => {
+    const growApples = (updateGrid: string[][], appleAmount: number) => {
 
-        var PosiblePositions: number[][] = [];
+        let PosiblePositions: number[][] = [];
 
         for(let row = 0; row < getGridHeight; row++){
             for(let col = 0; col < getGridWidth; col++){
-                
                 if(updateGrid[row][col] === ""){
                     PosiblePositions.push([row, col]);
                 }
             }
         }
 
+        let newApplePosition;
+        let applePosition
+
         if(PosiblePositions.length === 0){
             return;
         }
 
-        var newApplePosition = Math.floor(Math.random() * (PosiblePositions.length-1));
-        var applePosition = PosiblePositions[newApplePosition];
-        updateGrid[applePosition[0]][applePosition[1]] = "apple";
-        setGridArray(updateGrid);
-    
-        return;
-    }
-
-    const handleEating = (updateGrid: string[][]) => {
-
-        const moveInstructions = lastFootMoveInstructionRef.current;
-        for(let row = 0; row < getGridHeight; row++){
-            for(let col = 0; col < getGridWidth; col++){
-                if(updateGrid[row][col] === "foot"){
-                    updateGrid[row][col] = "body";
-                    updateGrid[row-moveInstructions[0]][col-moveInstructions[1]] = "foot";
-                    setGridArray(updateGrid);
-                    growApples(updateGrid);
-                    return;
-                }
-            }
+        for(let a = 0; a < appleAmount; a++){
+            newApplePosition = Math.floor(Math.random() * (PosiblePositions.length));
+            applePosition = PosiblePositions[newApplePosition];
+            updateGrid[applePosition[0]][applePosition[1]] = "apple";
+            PosiblePositions.splice(newApplePosition, 1);
         }
+
+        setGridArray(updateGrid);
+        return;
     }
 
     const initalizeGame = () => {
 
-        var setupGrid = getGridArray.map(row => [...row]);
+        let setupGrid = getGridArray.map(row => [...row]);
         
         for(let row = 0; row < getGridHeight; row++){
             for(let col = 0; col < getGridWidth; col++){
-
                 setupGrid[row][col] = "";
             }
         }
 
-        setupGrid[3][3] = "foot";
+        let yStartingPosition = Math.floor(getGridHeight/2);
+        let xStartingPosition = Math.floor(getGridWidth/2);
 
-        setupGrid[4][3] = "body";
-        setupGrid[5][3] = "body";
-        setupGrid[5][4] = "body";
+        setupGrid[yStartingPosition][xStartingPosition-1] = "foot";
+        setupGrid[yStartingPosition][xStartingPosition] = "head";
 
-        setupGrid[5][5] = "head";
+        growApples(setupGrid, getAppleAmount);
 
-        setupGrid[5][8] = "apple";
-        setupGrid[3][10] = "apple";
-        setupGrid[10][3] = "apple";
+        let setupMoveGrid = getMoveGrid.map(row => [[0, 1]]);
+
+        setupMoveGrid[5][3] = [0, 1];
+        setupMoveGrid[5][4] = [0, 1];
+        setupMoveGrid[5][5] = [1, 0];
 
         setGridArray(setupGrid)
 
-        var setupMoveGrid = getMoveGrid.map(row => [[0, 0]]);
-
-        setupMoveGrid[3][3] = [1, 0];
-
-        setupMoveGrid[4][3] = [1, 0];
-        setupMoveGrid[5][3] = [0, 1];
-        setupMoveGrid[5][4] = [0, 1];
-
-        setupMoveGrid[5][5] = [1, 0];
-
         setMoveGrid(setupMoveGrid);
 
-        setMoveDirectionY(0);
-        setMoveDirectionX(1);
+        setSaveMoveCommands([[0,1], [0,1]]);
     }
 
     const updateGrid = () => {
 
         const currentMoveGrid = moveGridRef.current;
         const currentGridArray = gridArrayRef.current;
-        const currentMoveDirectionY = moveDirectionYRef.current;
-        const currentMoveDirectionX = moveDirectionXRef.current;
+        const currentMoveDirectionY = saveMoveCommandsRef.current[0][0];
+        const currentMoveDirectionX = saveMoveCommandsRef.current[0][1];
 
-        var headMoved = false;
-        var footMoved = false;
-        var updateMoveGrid = currentMoveGrid.map(row => [...row]);
-        var updateGrid = currentGridArray.map(row => [...row]);
+        let headMoved = false;
+        let footMoved = false;
+        let appleConsumed = false;
+        let updateMoveGrid = currentMoveGrid.map(row => [...row]);
+        let updateGrid = currentGridArray.map(row => [...row]);
         for(let row = 0; row < getGridHeight; row++){
             for(let col = 0; col < getGridWidth; col++){
 
                if(!headMoved && updateGrid[row][col] === "head"){
 
                     if(row+currentMoveDirectionY >= getGridHeight || row+currentMoveDirectionY < 0){
-                        //console.log("loss-Wall-Height");
                         handleWallHit();
                         return;
                     }
 
                     if(col+currentMoveDirectionX >= getGridWidth || col+currentMoveDirectionX < 0){
-                        //console.log("loss-Wall-Width");
                         handleWallHit();
                         return;
                     }
 
-                    if(updateGrid[row+currentMoveDirectionY][col+currentMoveDirectionX] === "foot" || updateGrid[row+currentMoveDirectionY][col+currentMoveDirectionX] === "body"){
-                        //console.log("loss-Body");
+                    if(updateGrid[row+currentMoveDirectionY][col+currentMoveDirectionX] === "foot" || 
+                    updateGrid[row+currentMoveDirectionY][col+currentMoveDirectionX] === "body"){
                         handleWallHit();
                         return;
                     }
 
                     if(updateGrid[row+currentMoveDirectionY][col+currentMoveDirectionX] === "apple"){
-                        handleEating(updateGrid);
+                        growApples(updateGrid, 1);
+                        appleConsumed = true;
                     }
 
                     updateGrid[row][col] = "body";
@@ -217,6 +214,11 @@ export function HandleGameLogic() {
 
                     updateMoveGrid[row][col] = [currentMoveDirectionY, currentMoveDirectionX];
                     setMoveGrid(updateMoveGrid);
+
+                    const updatedMoveCommand = [...saveMoveCommandsRef.current];
+                    updatedMoveCommand[1] = saveMoveCommandsRef.current[0];
+                    setSaveMoveCommands(updatedMoveCommand);
+                    
                     headMoved = true;
                }
                 if(headMoved){
@@ -228,27 +230,22 @@ export function HandleGameLogic() {
             }
         }
 
+        checkGameWon(updateGrid);
+
         for(let row = 0; row < getGridHeight; row++){
             for(let col = 0; col < getGridWidth; col++){
-
                 if(!footMoved && updateGrid[row][col] === "foot"){
-
-                    if(updateGrid[row][col] !== "head"){
-                        updateGrid[row][col] = "";
+                    if(!appleConsumed){
+                        let moveInstruction = currentMoveGrid[row][col];
+                        setLastFootMoveInstruction(moveInstruction);
+                        updateGrid[row+moveInstruction[0]][col+moveInstruction[1]] = "foot";
+                        if(updateGrid[row][col] !== "head"){
+                            updateGrid[row][col] = "";
+                        }
                     }
-
-                    let moveInstruction = currentMoveGrid[row][col];
-                    setLastFootMoveInstruction(moveInstruction);
-
-                    updateGrid[row+moveInstruction[0]][col+moveInstruction[1]] = "foot";
-                    footMoved = true;
-                }
-
-                if(footMoved){
                     setGridArray(updateGrid);
                     return;
                 }
-
             }
         }
     }
