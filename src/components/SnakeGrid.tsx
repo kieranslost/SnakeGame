@@ -16,7 +16,7 @@ export function SnakeGrid () {
                 { Array.from({ length: getGridHeight }).map((_, rowIndex) => (
                     <tr key={rowIndex}>
                         {Array.from({ length: getGridWidth }).map((_, colIndex) => (
-                            <td>
+                            <td key={colIndex}>
                                 <SnakeBox id={getGridArray[rowIndex][colIndex]}/>
                             </td>
                         ))}
