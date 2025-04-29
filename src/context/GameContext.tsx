@@ -7,9 +7,6 @@ type GameSettings = {
     getGridArray: string[][];
     getMoveGrid: number[][][];
     getSaveMoveCommands: number[][];
-    getLastFootMoveInstruction: number[];
-    getMoveDirectionY: number;
-    getMoveDirectionX: number;
     getSnakeSpeed: number;
     getIntervalId: NodeJS.Timeout | null;
     getAppleAmount: number;
@@ -18,9 +15,6 @@ type GameSettings = {
     setGridArray: (w: string[][]) => void;
     setMoveGrid: (w: number[][][]) => void;
     setSaveMoveCommands: (w: number[][]) => void;
-    setLastFootMoveInstruction: (w: number[]) => void;
-    setMoveDirectionY: (w: number) => void;
-    setMoveDirectionX: (w: number) => void;
     setSnakeSpeed:(w: number) => void;
     setIntervalId: (w: NodeJS.Timeout | null) => void;
     setAppleAmount: (w: number) => void;
@@ -38,7 +32,6 @@ export const GameProvider = ({ children }: { children: React.ReactNode }) => {
   // Move Direction: 0 = neutral, 1 = positive, -1 = negative
   const [getMoveGrid, setMoveGrid] = useState<number[][][]>(Array(getGridHeight).fill(null).map(() => Array(getGridWidth).fill([0, 1])));
   const [getSaveMoveCommands, setSaveMoveCommands] = useState([[0,1], [0,1]])
-  const [getLastFootMoveInstruction, setLastFootMoveInstruction] = useState([0,1])
   const [getMoveDirectionY, setMoveDirectionY] = useState(0);
   const [getMoveDirectionX, setMoveDirectionX] = useState(1);
   // Grid Array
@@ -46,12 +39,10 @@ export const GameProvider = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <GameContext.Provider value={{ 
-      getGridWidth, getGridHeight, getGridArray, getMoveGrid, getSaveMoveCommands, 
-      getLastFootMoveInstruction, getMoveDirectionX, getMoveDirectionY, getSnakeSpeed, 
-      getIntervalId, getAppleAmount,
-      setGridWidth, setGridHeight, setGridArray, setMoveGrid, setSaveMoveCommands,
-      setLastFootMoveInstruction, setMoveDirectionX, setMoveDirectionY, setSnakeSpeed, 
-      setIntervalId, setAppleAmount,
+      getGridWidth, getGridHeight, getGridArray, getMoveGrid, 
+      getSaveMoveCommands, getSnakeSpeed, getIntervalId, getAppleAmount,
+      setGridWidth, setGridHeight, setGridArray, setMoveGrid, 
+      setSaveMoveCommands, setSnakeSpeed, setIntervalId, setAppleAmount,
     }}>
       {children}
     </GameContext.Provider>

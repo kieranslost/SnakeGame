@@ -9,13 +9,11 @@ export function HandleGameLogic() {
         getGridArray,
         getMoveGrid,
         getSaveMoveCommands,
-        getLastFootMoveInstruction,
         getIntervalId,
         getAppleAmount,
         setMoveGrid,
         setGridArray,
         setSaveMoveCommands,
-        setLastFootMoveInstruction,
         setIntervalId
     } = useGameSettings();
 
@@ -25,7 +23,6 @@ export function HandleGameLogic() {
     const moveGridRef = useRef(getMoveGrid);
     const gridArrayRef = useRef(getGridArray);
     const saveMoveCommandsRef = useRef(getSaveMoveCommands);
-    const lastFootMoveInstructionRef = useRef(getLastFootMoveInstruction);
     const intervalIdRef = useRef(getIntervalId);
 
     useEffect(() => {
@@ -37,9 +34,6 @@ export function HandleGameLogic() {
     useEffect(() => {
         saveMoveCommandsRef.current = getSaveMoveCommands;
     }, [getSaveMoveCommands]);
-    useEffect(() => {
-        lastFootMoveInstructionRef.current = getLastFootMoveInstruction;
-    }, [getLastFootMoveInstruction]);
     useEffect(() => {
         intervalIdRef.current = getIntervalId;
     }, [getIntervalId]);
@@ -236,9 +230,7 @@ export function HandleGameLogic() {
             for(let col = 0; col < getGridWidth; col++){
                 if(!footMoved && updateGrid[row][col] === "foot"){
                     if(!appleConsumed){
-                        let moveInstruction = currentMoveGrid[row][col];
-                        setLastFootMoveInstruction(moveInstruction);
-                        updateGrid[row+moveInstruction[0]][col+moveInstruction[1]] = "foot";
+                        updateGrid[row+currentMoveGrid[row][col][0]][col+currentMoveGrid[row][col][1]] = "foot";
                         if(updateGrid[row][col] !== "head"){
                             updateGrid[row][col] = "";
                         }
