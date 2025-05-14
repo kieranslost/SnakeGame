@@ -1,4 +1,3 @@
-import { StringSupportOption } from 'prettier';
 import React, { createContext, useContext, useState } from 'react';
 
 type GameSettings = {
@@ -24,16 +23,14 @@ export const GameContext = createContext<GameSettings | undefined>(undefined);
 
 export const GameProvider = ({ children }: { children: React.ReactNode }) => {
   // Grid Data
-  const [getGridWidth, setGridWidth] = useState(10);
-  const [getGridHeight, setGridHeight] = useState(10);
-  const [getSnakeSpeed, setSnakeSpeed] = useState(300);
+  const [getGridWidth, setGridWidth] = useState(22);
+  const [getGridHeight, setGridHeight] = useState(22);
+  const [getSnakeSpeed, setSnakeSpeed] = useState(200);
   const [getIntervalId, setIntervalId] = useState<NodeJS.Timeout | null>(null);
   const [getAppleAmount, setAppleAmount] = useState(3);
   // Move Direction: 0 = neutral, 1 = positive, -1 = negative
   const [getMoveGrid, setMoveGrid] = useState<number[][][]>(Array(getGridHeight).fill(null).map(() => Array(getGridWidth).fill([0, 1])));
   const [getSaveMoveCommands, setSaveMoveCommands] = useState([[0,1], [0,1]])
-  const [getMoveDirectionY, setMoveDirectionY] = useState(0);
-  const [getMoveDirectionX, setMoveDirectionX] = useState(1);
   // Grid Array
   const [getGridArray, setGridArray] = useState<string[][]>(Array(getGridHeight).fill(null).map(() => Array(getGridWidth).fill("")));
 
@@ -48,6 +45,13 @@ export const GameProvider = ({ children }: { children: React.ReactNode }) => {
     </GameContext.Provider>
   );
 };
+
+export function sanitizeNumberInput(input: number | undefined | null): number {
+  if (typeof input !== 'number' || isNaN(input)) {
+    return 1;
+  }
+  return input;
+}
 
 export const useGameSettings = () => {
   const context = useContext(GameContext);

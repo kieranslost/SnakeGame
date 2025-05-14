@@ -1,7 +1,7 @@
 import { Input } from '@mui/joy';
 import { AlternativeButton } from '../components/AlternativeButton';
 import { HandleGameLogic } from '../utils/HandleGameLogic';
-import { useGameSettings } from '../context/GameContext';
+import { useGameSettings, sanitizeNumberInput } from '../context/GameContext';
 import { SnakeGrid } from '../components/SnakeGrid';
 
 export function DisplayGame() {
@@ -12,9 +12,13 @@ export function DisplayGame() {
         getSnakeSpeed,
         getIntervalId,
         getAppleAmount,
+        getGridHeight,
+        getGridWidth,
         setSnakeSpeed,
         setIntervalId,
-        setAppleAmount
+        setAppleAmount,
+        setGridHeight,
+        setGridWidth,
     } = useGameSettings();
 
     const startGame = () => {
@@ -28,20 +32,49 @@ export function DisplayGame() {
         setIntervalId(setInterval(updateGrid, getSnakeSpeed));
     }
 
-    return(
+    return (
         <>
-            <AlternativeButton sx={{backgroundColor:"#FF9B85", margin:"10px 10px"}} onClick={startGame}>Start</AlternativeButton>
-            <br/>
-            <div style={{marginLeft: "10px"}}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: '10px' }}>
+                <AlternativeButton
+                    sx={{ backgroundColor: "#FF9B85" }}
+                    onClick={startGame}
+                >
+                    Start
+                </AlternativeButton>
+
                 Snake Speed:
-                <Input type={"number"} sx={{width: "100px"}} value={getSnakeSpeed}
-                    onChange={e => setSnakeSpeed(e.target.valueAsNumber)}></Input>
+                <Input
+                    type="number"
+                    sx={{ width: "100px"}}
+                    value={getSnakeSpeed}
+                    onChange={e => setSnakeSpeed(sanitizeNumberInput(e.target.valueAsNumber))}
+                />
+            
+                Grid Height:
+                <Input
+                    type="number"
+                    sx={{ width: "100px" }}
+                    value={getGridHeight}
+                    onChange={e => setGridHeight(sanitizeNumberInput(e.target.valueAsNumber))}
+                />
+            
+                Grid Width:
+                <Input
+                    type="number"
+                    sx={{ width: "100px" }}
+                    value={getGridWidth}
+                    onChange={e => setGridWidth(sanitizeNumberInput(e.target.valueAsNumber))}
+                />
+            
                 Apple Amount:
-                <Input type={"number"} sx={{width: "100px"}} value={getAppleAmount}
-                    onChange={e => setAppleAmount(e.target.valueAsNumber)}></Input>
-                    
+                <Input
+                    type="number"
+                    sx={{ width: "100px" }}
+                    value={getAppleAmount}
+                    onChange={e => setAppleAmount(sanitizeNumberInput(e.target.valueAsNumber))}
+                />
             </div>
-            <SnakeGrid></SnakeGrid>
+            <SnakeGrid />
         </>
     );
-}
+}    

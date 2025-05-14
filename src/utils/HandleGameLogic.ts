@@ -147,6 +147,10 @@ export function HandleGameLogic() {
         let yStartingPosition = Math.floor(getGridHeight/2);
         let xStartingPosition = Math.floor(getGridWidth/2);
 
+        if(xStartingPosition > 6){
+            xStartingPosition = 4;
+        }
+
         setupGrid[yStartingPosition][xStartingPosition-1] = "foot";
         setupGrid[yStartingPosition][xStartingPosition] = "head";
 
@@ -154,9 +158,9 @@ export function HandleGameLogic() {
 
         let setupMoveGrid = getMoveGrid.map(row => [[0, 1]]);
 
-        setupMoveGrid[5][3] = [0, 1];
-        setupMoveGrid[5][4] = [0, 1];
-        setupMoveGrid[5][5] = [1, 0];
+        setupMoveGrid[yStartingPosition][xStartingPosition-2] = [0, 1];
+        setupMoveGrid[yStartingPosition][xStartingPosition-1] = [0, 1];
+        setupMoveGrid[yStartingPosition][xStartingPosition] = [1, 0];
 
         setGridArray(setupGrid)
 
